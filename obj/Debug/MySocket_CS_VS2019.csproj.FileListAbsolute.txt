@@ -1,0 +1,6 @@
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\bin\Debug\MySocket_CS_VS2019.dll
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\bin\Debug\MySocket_CS_VS2019.pdb
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\obj\Debug\MySocket_CS_VS2019.csproj.AssemblyReference.cache
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\obj\Debug\MySocket_CS_VS2019.csproj.CoreCompileInputs.cache
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\obj\Debug\MySocket_CS_VS2019.dll
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\obj\Debug\MySocket_CS_VS2019.pdb
