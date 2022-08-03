@@ -4,34 +4,25 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace MySocket_CS_VS2019
+namespace MySocket
 {
     public class MyClient
     {
         private Socket socket;
         public Action<string> ReceivCallback;
+        public Action<string> MsgCallback;
 
         public MyClient()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
-        public void Connect(string ip, int port)
+        ~MyClient()
         {
-            IPAddress myIp = IPAddress.Parse(ip);
-
-            IPEndPoint point = new IPEndPoint(myIp, port);
-
-            socket.Connect(point);
-
-            ShowMsg("Connect Succese! " + socket.RemoteEndPoint.ToString());
-
-            Thread ReceiveMsg = new Thread(ReceiveMsgFromServer);
-
-            ReceiveMsg.IsBackground = true;
-
-            ReceiveMsg.Start();
+            Close();
         }
+
+        #region private method
 
         private void ReceiveMsgFromServer()
         {
@@ -39,7 +30,16 @@ namespace MySocket_CS_VS2019
             {
                 byte[] buffer = new byte[1024];
 
-                int rec = socket.Receive(buffer);
+                int rec = 0;
+
+                try
+                {
+                    rec = socket.Receive(buffer);
+                }
+                catch (Exception se)
+                {
+                    ShowMsg(string.Format("Client Receive 失敗 : {0}", se.Message));
+                }
 
                 if (rec == 0)
                 {
@@ -53,17 +53,60 @@ namespace MySocket_CS_VS2019
 
                 ShowMsg("Server :" + receText);
             }
+        }                
+
+        private void ShowMsg(string s)
+        {
+            if (MsgCallback != null)
+                MsgCallback(s);
+            else
+                Console.WriteLine(s);
         }
 
-        private void SendMsgToServer(string msg)
+        #endregion
+
+        #region public method
+
+        public void Connect(string ip, int port)
+        {
+            IPAddress myIp = IPAddress.Parse(ip);
+
+            IPEndPoint point = new IPEndPoint(myIp, port);
+
+            try
+            {
+                socket.Connect(point);
+
+                ShowMsg("Connect Succese! " + socket.RemoteEndPoint.ToString());
+
+                Thread ReceiveMsg = new Thread(ReceiveMsgFromServer);
+
+                ReceiveMsg.IsBackground = true;
+
+                ReceiveMsg.Start();
+            }
+            catch(Exception se)
+            {
+                ShowMsg("Connect Fail! ");
+                ShowMsg("Error Message :" + se.Message);
+            }
+        }
+
+        public void SendMsgToServer(string msg)
         {
             byte[] buffer = System.Text.Encoding.UTF8.GetBytes(msg);
             socket.Send(buffer);
         }
 
-        private static void ShowMsg(string s)
+        public void Close()
         {
-            Console.WriteLine(s);
+            socket.Close();
         }
+
+        #endregion
+
+
+
+
     }
 }

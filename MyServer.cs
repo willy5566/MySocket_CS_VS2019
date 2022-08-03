@@ -14,8 +14,10 @@ namespace MySocket
         int port;
         int allowNum;
         Thread thServer;
-        List<Socket> clientList;
-        public Action<string> ReceivCallback;
+        public List<Socket> clientList;
+        public Action<Socket, string> ReceivCallback;
+        public Action<string> MsgCallback;
+        public Action<string> UpdateClientList;
 
         public MyServer(int myPort = 10001, string myIP = "")
         {
@@ -34,17 +36,12 @@ namespace MySocket
             allowNum = 10;
         }
 
-        public void SetMaxClientNumber(int allowNum)
+        ~MyServer()
         {
-            this.allowNum = allowNum;
+            Close();
         }
 
-        public void Listen()
-        {
-            socketListener.Listen(allowNum);
-            thServer = new Thread(ServerCommunity);
-            thServer.Start(socketListener);
-        }
+        #region private method
 
         private void ServerCommunity(object obListener)
         {
@@ -52,13 +49,22 @@ namespace MySocket
 
             while (true)
             {
-                Socket socketSender = temp.Accept();
-                clientList.Add(socketSender);
-                ShowMsg(("Client IP = " + socketSender.RemoteEndPoint.ToString()) + " Connect Succese!");
-
-                Thread ReceiveMsg = new Thread(ReceiveClient);
-                ReceiveMsg.IsBackground = true;
-                ReceiveMsg.Start(socketSender);
+                try
+                {
+                    Socket socketSender = temp.Accept();
+                    clientList.Add(socketSender);
+                    ShowMsg(("Client IP = " + socketSender.RemoteEndPoint.ToString()) + " Connect Succese!");
+                    //UpdateClientList(ClientListToString());
+                    Thread ReceiveMsg = new Thread(ReceiveClient);
+                    ReceiveMsg.IsBackground = true;
+                    ReceiveMsg.Start(socketSender);
+                }
+                catch (Exception se)
+                {
+                    //ShowMsg("Thread Abort!");
+                    //ShowMsg(se.Message);
+                    break;
+                }
             }
         }
 
@@ -71,32 +77,98 @@ namespace MySocket
 
                 byte[] buffer = new byte[1024];
 
-                int rece = socketSender.Receive(buffer);
+                int rece = 0;
+
+                try
+                {
+                    rece = socketSender.Receive(buffer);
+                }
+                catch (Exception se)
+                {
+                    ShowMsg(string.Format("Client Receive 失敗 : {0}", se.Message));
+                }
 
                 if (rece == 0)
                 {
-                    ShowMsg(string.Format("Client : {0} + 下線了", socketSender.RemoteEndPoint.ToString()));
+                    ShowMsg(string.Format("Client : {0} 下線了", socketSender.RemoteEndPoint.ToString()));
                     clientList.Remove(socketSender);
+                    //UpdateClientList(ClientListToString());
                     break;
                 }
                 string clientMsg = Encoding.UTF8.GetString(buffer, 0, rece);
                 if (ReceivCallback != null)
-                    ReceivCallback(clientMsg);
+                    ReceivCallback(socketSender, clientMsg);
 
                 ShowMsg(string.Format("Client : {0}", clientMsg));
             }
         }
 
-        private void SendMsgToClient(Socket socketSender, string msg)
+        private string ClientListToString()
+        {
+            string cmd = "";
+            cmd += clientList[0].RemoteEndPoint.ToString();
+            for (int i = 1; i < clientList.Count; i++)
+            {
+                cmd += clientList[i].RemoteEndPoint.ToString() + ",";
+            }
+
+            return cmd;
+        }
+
+        private void ShowMsg(string s)
+        {
+            if (MsgCallback != null)
+                MsgCallback(s);
+            else
+                Console.WriteLine(s);
+        }
+
+        #endregion
+
+        #region public method
+
+        public void SetMaxClientNumber(int allowNum)
+        {
+            this.allowNum = allowNum;
+        }
+
+        public void Listen()
+        {
+            socketListener.Listen(allowNum);
+            thServer = new Thread(ServerCommunity);
+            thServer.Start(socketListener);
+            ShowMsg("IP: " + point.Address);
+            ShowMsg("Port: " + point.Port);
+            ShowMsg("Max number of connections: " + allowNum);
+            ShowMsg("Listening...");
+        }
+
+        public void SendMsgToClient(Socket socketSender, string msg)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(msg);
-
             socketSender.Send(buffer);
+            ShowMsg("Send to " + socketSender.RemoteEndPoint.ToString() + ": " + msg);
         }
 
-        private static void ShowMsg(string s)
+        public void SendMsgToAllClient(string msg)
         {
-            Console.WriteLine(s);
+            byte[] buffer = Encoding.UTF8.GetBytes(msg);
+            foreach (var client in clientList)
+            {
+                client.Send(buffer);
+            }
+            ShowMsg("Send to all: " + msg);
         }
+
+        public void Close()
+        {
+            foreach (var client in clientList)
+            {
+                client.Close();
+            }
+            socketListener.Close();
+        }
+
+        #endregion
     }
 }
