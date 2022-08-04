@@ -17,6 +17,7 @@ namespace MyClient_Demo
     {
         MyClient client;
         delegate void ShowMsg(string msg);
+        delegate void ShowConnecting(ConnectType connectType);
 
         public Form1()
         {
@@ -39,6 +40,9 @@ namespace MyClient_Demo
                 {
                     SendMsg(tbSendMsg.Text);
                     tbSendMsg.Text = "";
+
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
                 }
             }
         }
@@ -53,23 +57,49 @@ namespace MyClient_Demo
         #endregion
         public void InitialClient()
         {
+            if (client != null)
+            {
+                client.Close();
+                client = null;
+            }
             client = new MyClient();
             string ip = tbIP.Text;
             int port = Convert.ToInt32(tbPort.Text);
             client.ReceivCallback += ReceiveCallback;
             //client.MsgCallback += MsgCallback;
+            client.ConnectionStatusChange += ConnectingChange;
             client.Connect(ip, port);
         }
 
         private void ReceiveCallback(string msg)
         {
-            SendMsgInvoke(msg);
+            if (msg[1] == '#')
+            {
+                switch (msg[0])
+                {
+                    case SendType.MESSAGE:
+                        SendMsgInvoke(msg.Substring(2));
+                        break;
+                    case SendType.CLIENT_LIST:
+                        UpdateClientListInvoke(msg.Substring(2));
+                        break;
+                }
+            }
+            //SendMsgInvoke(msg);
         }
 
         private void MsgCallback(string msg)
         {
             string sMsg = "System :" + msg;
             SendMsgInvoke(sMsg);
+        }
+
+        private void ConnectingChange(bool bConnecting)
+        {
+            if(bConnecting)
+                UpdateConnectStateInvoke(ConnectType.Success);
+            else
+                UpdateConnectStateInvoke(ConnectType.Failure);
         }
 
         private void SendMsgInvoke(string msg)
@@ -92,7 +122,76 @@ namespace MyClient_Demo
 
         private void SendMsg(string msg)
         {
-            client.SendMsgToServer(msg);
-        }        
+            SendMsg(SendType.MESSAGE, msg);
+        }
+
+        private void SendMsg(char cType, string msg)
+        {
+            if (client.Connecting)
+            {
+                string sMsg = cType + "#" + msg;
+                client.SendMsgToServer(sMsg);
+            }
+            else
+            {
+                AddMsg("目前尚未連線...");
+            }
+        }
+
+        private void UpdateClientListInvoke(string sClientList)
+        {
+            if (this.InvokeRequired)
+            {
+                ShowMsg sInvokeMsg = new ShowMsg(UpdateClientList);
+                this.Invoke(sInvokeMsg, sClientList);
+            }
+            else
+            {
+                UpdateClientList(sClientList);
+            }
+        }
+
+        private void UpdateClientList(string sClientList)
+        {
+            var sClientArray = sClientList.Split(',');
+            lsbClientList.Items.Clear();
+            //foreach(var sClient in sClientArray)
+            //{
+            //    lsbClientList.Items.Add(sClient);
+            //}
+            lsbClientList.Items.AddRange(sClientArray);
+        }
+
+        private void UpdateConnectStateInvoke(ConnectType connectType)
+        {
+            if (this.InvokeRequired)
+            {
+                ShowConnecting sInvokeMsg = new ShowConnecting(UpdateConnectState);
+                this.Invoke(sInvokeMsg, connectType);
+            }
+            else
+            {
+                UpdateConnectState(connectType);
+            }
+        }
+
+        private void UpdateConnectState(ConnectType connectType)
+        {
+            switch(connectType)
+            {
+                case ConnectType.Success:
+                    lbConnectType.Text = "已連線";
+                    lbConnectType.BackColor = Color.LimeGreen;
+                    break;
+                case ConnectType.Failure:
+                    lbConnectType.Text = "連線失敗";
+                    lbConnectType.BackColor = Color.OrangeRed;
+                    break;
+                case ConnectType.Disconnect:
+                    lbConnectType.Text = "已斷線";
+                    lbConnectType.BackColor = Color.IndianRed;
+                    break;
+            }
+        }
     }
 }

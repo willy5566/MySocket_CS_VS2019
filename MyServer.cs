@@ -17,7 +17,7 @@ namespace MySocket
         public List<Socket> clientList;
         public Action<Socket, string> ReceivCallback;
         public Action<string> MsgCallback;
-        public Action<string> UpdateClientList;
+        public Action<string> ClientListChange;
 
         public MyServer(int myPort = 10001, string myIP = "")
         {
@@ -54,7 +54,8 @@ namespace MySocket
                     Socket socketSender = temp.Accept();
                     clientList.Add(socketSender);
                     ShowMsg(("Client IP = " + socketSender.RemoteEndPoint.ToString()) + " Connect Succese!");
-                    //UpdateClientList(ClientListToString());
+                    if (ClientListChange != null)
+                        ClientListChange(ClientListToString());
                     Thread ReceiveMsg = new Thread(ReceiveClient);
                     ReceiveMsg.IsBackground = true;
                     ReceiveMsg.Start(socketSender);
@@ -92,7 +93,8 @@ namespace MySocket
                 {
                     ShowMsg(string.Format("Client : {0} 下線了", socketSender.RemoteEndPoint.ToString()));
                     clientList.Remove(socketSender);
-                    //UpdateClientList(ClientListToString());
+                    if (ClientListChange != null)
+                        ClientListChange(ClientListToString());
                     break;
                 }
                 string clientMsg = Encoding.UTF8.GetString(buffer, 0, rece);
@@ -109,7 +111,7 @@ namespace MySocket
             cmd += clientList[0].RemoteEndPoint.ToString();
             for (int i = 1; i < clientList.Count; i++)
             {
-                cmd += clientList[i].RemoteEndPoint.ToString() + ",";
+                cmd += "," + clientList[i].RemoteEndPoint.ToString();
             }
 
             return cmd;

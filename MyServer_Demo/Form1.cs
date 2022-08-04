@@ -57,6 +57,9 @@ namespace MyServer_Demo
                 {
                     SendMsgFromServer(tbSendMsg.Text);
                     tbSendMsg.Text = "";
+
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
                 }
             }
         }
@@ -77,6 +80,7 @@ namespace MyServer_Demo
             }
             server.ReceivCallback += ReceiveCallback;
             server.MsgCallback += MsgCallback;
+            server.ClientListChange += SendClientList;
         }       
 
         private void ReceiveCallback(Socket client, string msg)
@@ -91,7 +95,16 @@ namespace MyServer_Demo
             {
                 lsbReceivMsg.Items.Add(sMsg);
             }
-            SendMsgFromClient(client, msg);
+            if(msg[1]=='#')
+            {
+                switch(msg[0])
+                {
+                    case SendType.MESSAGE:
+                        SendMsgFromClient(client, msg.Substring(2));
+                        break;
+                }
+            }
+            //SendMsgFromClient(client, msg);
         }
 
         private void MsgCallback(string msg)
@@ -107,18 +120,31 @@ namespace MyServer_Demo
             }
         }
 
+        private void SendMsg(char cType, string msg)
+        {
+            string sMsg = cType + "#" + msg;
+            server.SendMsgToAllClient(sMsg);
+        }
+
+        private void SendClientList(string sClientList)
+        {
+            SendMsg(SendType.CLIENT_LIST, sClientList);
+        }
+
         private void SendMsgFromClient(Socket client, string msg)
         {
             string sMsg = client.RemoteEndPoint.ToString() + " : " + msg;
             SendMsgInvoke(sMsg);
-            server.SendMsgToAllClient(sMsg);
+            SendMsg(SendType.MESSAGE, sMsg);
+            //server.SendMsgToAllClient(sMsg);
         }
 
         private void SendMsgFromServer(string msg)
         {
             string sMsg = "Server :" + msg;
             SendMsgInvoke(sMsg);
-            server.SendMsgToAllClient(sMsg);           
+            SendMsg(SendType.MESSAGE, sMsg);
+            //server.SendMsgToAllClient(sMsg);           
         }
 
         private void SendMsgInvoke(string msg)

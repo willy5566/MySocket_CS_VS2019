@@ -11,10 +11,21 @@ namespace MySocket
         private Socket socket;
         public Action<string> ReceivCallback;
         public Action<string> MsgCallback;
+        public Action<bool> ConnectionStatusChange;
+
+        private bool connecting;
+        public bool Connecting 
+        { 
+            get 
+            { 
+                return connecting; 
+            } 
+        }
 
         public MyClient()
         {
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            connecting = false;
         }
 
         ~MyClient()
@@ -43,6 +54,7 @@ namespace MySocket
 
                 if (rec == 0)
                 {
+                    SetConnecting(false);
                     ShowMsg("Server Loss!");
                     break;
                 }
@@ -67,15 +79,19 @@ namespace MySocket
 
         #region public method
 
-        public void Connect(string ip, int port)
+        public bool Connect(string ip, int port)
         {
             IPAddress myIp = IPAddress.Parse(ip);
 
             IPEndPoint point = new IPEndPoint(myIp, port);
 
+            bool rtn = false;
+
             try
             {
                 socket.Connect(point);
+
+                rtn = true;
 
                 ShowMsg("Connect Succese! " + socket.RemoteEndPoint.ToString());
 
@@ -90,6 +106,17 @@ namespace MySocket
                 ShowMsg("Connect Fail! ");
                 ShowMsg("Error Message :" + se.Message);
             }
+
+            SetConnecting(rtn);
+
+            return rtn;
+        }
+
+        private void SetConnecting(bool bConnecting)
+        {
+            connecting = bConnecting;
+            if (ConnectionStatusChange != null)
+                ConnectionStatusChange(connecting);
         }
 
         public void SendMsgToServer(string msg)
@@ -104,9 +131,5 @@ namespace MySocket
         }
 
         #endregion
-
-
-
-
     }
 }

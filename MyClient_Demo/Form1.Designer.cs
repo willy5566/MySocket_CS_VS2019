@@ -39,6 +39,7 @@ namespace MyClient_Demo
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tbSendMsg = new System.Windows.Forms.TextBox();
+            this.lbConnectType = new System.Windows.Forms.Label();
             this.gbClientList.SuspendLayout();
             this.gbSocketInfo.SuspendLayout();
             this.SuspendLayout();
@@ -62,7 +63,6 @@ namespace MyClient_Demo
             this.gbClientList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.gbClientList.Controls.Add(this.lsbClientList);
-            this.gbClientList.Enabled = false;
             this.gbClientList.Location = new System.Drawing.Point(12, 114);
             this.gbClientList.Name = "gbClientList";
             this.gbClientList.Size = new System.Drawing.Size(158, 324);
@@ -85,6 +85,7 @@ namespace MyClient_Demo
             // 
             // gbSocketInfo
             // 
+            this.gbSocketInfo.Controls.Add(this.lbConnectType);
             this.gbSocketInfo.Controls.Add(this.tbPort);
             this.gbSocketInfo.Controls.Add(this.btnConfirm);
             this.gbSocketInfo.Controls.Add(this.tbIP);
@@ -151,6 +152,19 @@ namespace MyClient_Demo
             this.tbSendMsg.Size = new System.Drawing.Size(278, 22);
             this.tbSendMsg.TabIndex = 5;
             // 
+            // lbConnectType
+            // 
+            this.lbConnectType.BackColor = System.Drawing.Color.Silver;
+            this.lbConnectType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbConnectType.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lbConnectType.ForeColor = System.Drawing.Color.White;
+            this.lbConnectType.Location = new System.Drawing.Point(8, 66);
+            this.lbConnectType.Name = "lbConnectType";
+            this.lbConnectType.Size = new System.Drawing.Size(60, 23);
+            this.lbConnectType.TabIndex = 2;
+            this.lbConnectType.Text = "未連線";
+            this.lbConnectType.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -186,6 +200,7 @@ namespace MyClient_Demo
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tbSendMsg;
+        private System.Windows.Forms.Label lbConnectType;
     }
 }
 

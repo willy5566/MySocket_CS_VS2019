@@ -32,14 +32,14 @@ namespace MyServer_Demo
             this.components = new System.ComponentModel.Container();
             this.btnConfirm = new System.Windows.Forms.Button();
             this.gbSocketInfo = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.tbIP = new System.Windows.Forms.TextBox();
+            this.ckbAutoSocketInfo = new System.Windows.Forms.CheckBox();
             this.tbPort = new System.Windows.Forms.TextBox();
+            this.tbIP = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.lsbClientList = new System.Windows.Forms.ListBox();
             this.tbSendMsg = new System.Windows.Forms.TextBox();
             this.gbClientList = new System.Windows.Forms.GroupBox();
-            this.ckbAutoSocketInfo = new System.Windows.Forms.CheckBox();
             this.tmUpdate = new System.Windows.Forms.Timer(this.components);
             this.lsbReceivMsg = new System.Windows.Forms.ListBox();
             this.lsbServerMsg = new System.Windows.Forms.ListBox();
@@ -75,14 +75,31 @@ namespace MyServer_Demo
             this.gbSocketInfo.TabStop = false;
             this.gbSocketInfo.Text = "連線資訊";
             // 
-            // label1
+            // ckbAutoSocketInfo
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 18);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(24, 12);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "IP : ";
+            this.ckbAutoSocketInfo.AutoSize = true;
+            this.ckbAutoSocketInfo.Location = new System.Drawing.Point(8, 70);
+            this.ckbAutoSocketInfo.Name = "ckbAutoSocketInfo";
+            this.ckbAutoSocketInfo.Size = new System.Drawing.Size(47, 16);
+            this.ckbAutoSocketInfo.TabIndex = 2;
+            this.ckbAutoSocketInfo.Text = "Auto";
+            this.ckbAutoSocketInfo.UseVisualStyleBackColor = true;
+            // 
+            // tbPort
+            // 
+            this.tbPort.Location = new System.Drawing.Point(49, 38);
+            this.tbPort.Name = "tbPort";
+            this.tbPort.Size = new System.Drawing.Size(100, 22);
+            this.tbPort.TabIndex = 1;
+            this.tbPort.Text = "10001";
+            // 
+            // tbIP
+            // 
+            this.tbIP.Location = new System.Drawing.Point(49, 15);
+            this.tbIP.Name = "tbIP";
+            this.tbIP.Size = new System.Drawing.Size(100, 22);
+            this.tbIP.TabIndex = 1;
+            this.tbIP.Text = "192.168.1.105";
             // 
             // label2
             // 
@@ -93,21 +110,14 @@ namespace MyServer_Demo
             this.label2.TabIndex = 0;
             this.label2.Text = "Port : ";
             // 
-            // tbIP
+            // label1
             // 
-            this.tbIP.Location = new System.Drawing.Point(49, 15);
-            this.tbIP.Name = "tbIP";
-            this.tbIP.Size = new System.Drawing.Size(100, 22);
-            this.tbIP.TabIndex = 1;
-            this.tbIP.Text = "192.168.1.105";
-            // 
-            // tbPort
-            // 
-            this.tbPort.Location = new System.Drawing.Point(49, 38);
-            this.tbPort.Name = "tbPort";
-            this.tbPort.Size = new System.Drawing.Size(100, 22);
-            this.tbPort.TabIndex = 1;
-            this.tbPort.Text = "10001";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 18);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(24, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "IP : ";
             // 
             // lsbClientList
             // 
@@ -143,16 +153,6 @@ namespace MyServer_Demo
             this.gbClientList.TabIndex = 3;
             this.gbClientList.TabStop = false;
             this.gbClientList.Text = "上線人員";
-            // 
-            // ckbAutoSocketInfo
-            // 
-            this.ckbAutoSocketInfo.AutoSize = true;
-            this.ckbAutoSocketInfo.Location = new System.Drawing.Point(8, 70);
-            this.ckbAutoSocketInfo.Name = "ckbAutoSocketInfo";
-            this.ckbAutoSocketInfo.Size = new System.Drawing.Size(47, 16);
-            this.ckbAutoSocketInfo.TabIndex = 2;
-            this.ckbAutoSocketInfo.Text = "Auto";
-            this.ckbAutoSocketInfo.UseVisualStyleBackColor = true;
             // 
             // tmUpdate
             // 
