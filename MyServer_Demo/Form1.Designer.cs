@@ -45,9 +45,13 @@ namespace MyServer_Demo
             this.lsbServerMsg = new System.Windows.Forms.ListBox();
             this.lsbMsg = new System.Windows.Forms.ListBox();
             this.gbBackground = new System.Windows.Forms.GroupBox();
+            this.MenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.itemReName = new System.Windows.Forms.ToolStripMenuItem();
+            this.itemSendMsg = new System.Windows.Forms.ToolStripMenuItem();
             this.gbSocketInfo.SuspendLayout();
             this.gbClientList.SuspendLayout();
             this.gbBackground.SuspendLayout();
+            this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnConfirm
@@ -213,6 +217,26 @@ namespace MyServer_Demo
             this.gbBackground.TabStop = false;
             this.gbBackground.Text = "後臺資訊";
             // 
+            // MenuStrip
+            // 
+            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.itemReName,
+            this.itemSendMsg});
+            this.MenuStrip.Name = "MenuStrip";
+            this.MenuStrip.Size = new System.Drawing.Size(123, 48);
+            // 
+            // itemReName
+            // 
+            this.itemReName.Name = "itemReName";
+            this.itemReName.Size = new System.Drawing.Size(180, 22);
+            this.itemReName.Text = "改變名稱";
+            // 
+            // itemSendMsg
+            // 
+            this.itemSendMsg.Name = "itemSendMsg";
+            this.itemSendMsg.Size = new System.Drawing.Size(180, 22);
+            this.itemSendMsg.Text = "傳送訊息";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -233,6 +257,7 @@ namespace MyServer_Demo
             this.gbSocketInfo.PerformLayout();
             this.gbClientList.ResumeLayout(false);
             this.gbBackground.ResumeLayout(false);
+            this.MenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -255,6 +280,9 @@ namespace MyServer_Demo
         private System.Windows.Forms.ListBox lsbServerMsg;
         private System.Windows.Forms.ListBox lsbMsg;
         private System.Windows.Forms.GroupBox gbBackground;
+        private System.Windows.Forms.ContextMenuStrip MenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem itemReName;
+        private System.Windows.Forms.ToolStripMenuItem itemSendMsg;
     }
 }
 

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using MySocket;
 
 namespace MyServer_Demo
@@ -16,6 +17,7 @@ namespace MyServer_Demo
     public partial class Form1 : Form
     {
         MyServer server;
+        public Dictionary<Socket, string> clientNameDict; // client名稱
         delegate void ShowMsg(string msg);
 
         public Form1()
@@ -78,9 +80,13 @@ namespace MyServer_Demo
                 int port = Convert.ToInt32(tbPort.Text);
                 server = new MyServer(port, ip);
             }
+            clientNameDict = new Dictionary<Socket, string>();
+
             server.ReceivCallback += ReceiveCallback;
             server.MsgCallback += MsgCallback;
             server.ClientListChange += SendClientList;
+            server.ClientSuccessCallback += SendClientIPandPort;
+            server.ClientSuccessCallback += SetClientName;            
         }       
 
         private void ReceiveCallback(Socket client, string msg)
@@ -95,12 +101,18 @@ namespace MyServer_Demo
             {
                 lsbReceivMsg.Items.Add(sMsg);
             }
+
             if(msg[1]=='#')
             {
-                switch(msg[0])
-                {
+                string sMsg2 = msg.Substring(2);
+                switch (msg[0])
+                {                    
                     case SendType.MESSAGE:
-                        SendMsgFromClient(client, msg.Substring(2));
+                        SendMsgFromClient(client, sMsg2);
+                        break;
+                    case SendType.MODIFY_NAME:
+                        SetClientName(client, sMsg2);
+                        SendClientList("");
                         break;
                 }
             }
@@ -120,22 +132,39 @@ namespace MyServer_Demo
             }
         }
 
-        private void SendMsg(char cType, string msg)
+        private void SendMsgAll(char cType, string msg)
         {
             string sMsg = cType + "#" + msg;
             server.SendMsgToAllClient(sMsg);
         }
 
+        // 送給單獨Client 20220811
+        private void SendMsgClient(Socket client, char cType, string msg)
+        {
+            string sMsg = cType + "#" + msg;
+            server.SendMsgToClient(client, sMsg);
+        }
+
         private void SendClientList(string sClientList)
         {
-            SendMsg(SendType.CLIENT_LIST, sClientList);
+            if (server.clientList.Count < 1)
+                return;
+
+            string rtn = clientNameDict[server.clientList[0]];
+            for (int i = 1; i < server.clientList.Count; i++)
+            {
+                rtn += "," + clientNameDict[server.clientList[i]];
+            }
+            //server.clientList
+            SendMsgAll(SendType.CLIENT_LIST, rtn);
         }
 
         private void SendMsgFromClient(Socket client, string msg)
         {
-            string sMsg = client.RemoteEndPoint.ToString() + " :" + msg;
+            //string sMsg = client.RemoteEndPoint.ToString() + " :" + msg;
+            string sMsg = clientNameDict[client] + " :" + msg;
             SendMsgInvoke(sMsg);
-            SendMsg(SendType.MESSAGE, sMsg);
+            SendMsgAll(SendType.MESSAGE, sMsg);
             //server.SendMsgToAllClient(sMsg);
         }
 
@@ -143,8 +172,30 @@ namespace MyServer_Demo
         {
             string sMsg = "Server :" + msg;
             SendMsgInvoke(sMsg);
-            SendMsg(SendType.MESSAGE, sMsg);
+            SendMsgAll(SendType.MESSAGE, sMsg);
             //server.SendMsgToAllClient(sMsg);           
+        }
+
+        // 告訴Client他的IP跟Port 20220811
+        private void SendClientIPandPort(Socket client)
+        {
+            string msg = client.RemoteEndPoint.ToString();
+
+            SendMsgClient(client, SendType.SEND_CLINET_IP_PORT, msg);
+
+            Thread.Sleep(100);
+        }
+
+        private void SetClientName(Socket client)
+        {
+            string name = "匿名" + client.RemoteEndPoint.ToString().Split(':')[1];
+            clientNameDict.Add(client, name);
+        }
+
+        private void SetClientName(Socket client, string sName)
+        {
+            string name = sName + client.RemoteEndPoint.ToString().Split(':')[1];
+            clientNameDict[client] = name;
         }
 
         private void SendMsgInvoke(string msg)

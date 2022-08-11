@@ -29,19 +29,23 @@ namespace MyClient_Demo
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.lsbMsg = new System.Windows.Forms.ListBox();
             this.gbClientList = new System.Windows.Forms.GroupBox();
             this.lsbClientList = new System.Windows.Forms.ListBox();
             this.gbSocketInfo = new System.Windows.Forms.GroupBox();
+            this.lbConnectType = new System.Windows.Forms.Label();
             this.tbPort = new System.Windows.Forms.TextBox();
             this.btnConfirm = new System.Windows.Forms.Button();
             this.tbIP = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.tbSendMsg = new System.Windows.Forms.TextBox();
-            this.lbConnectType = new System.Windows.Forms.Label();
+            this.MenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
             this.gbClientList.SuspendLayout();
             this.gbSocketInfo.SuspendLayout();
+            this.MenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // lsbMsg
@@ -82,6 +86,8 @@ namespace MyClient_Demo
             this.lsbClientList.ScrollAlwaysVisible = true;
             this.lsbClientList.Size = new System.Drawing.Size(141, 292);
             this.lsbClientList.TabIndex = 2;
+            this.lsbClientList.SelectedIndexChanged += new System.EventHandler(this.lsbClientList_SelectedIndexChanged);
+            this.lsbClientList.MouseUp += new System.Windows.Forms.MouseEventHandler(this.lsbClientList_MouseUp);
             // 
             // gbSocketInfo
             // 
@@ -97,6 +103,19 @@ namespace MyClient_Demo
             this.gbSocketInfo.TabIndex = 4;
             this.gbSocketInfo.TabStop = false;
             this.gbSocketInfo.Text = "連線資訊";
+            // 
+            // lbConnectType
+            // 
+            this.lbConnectType.BackColor = System.Drawing.Color.Silver;
+            this.lbConnectType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.lbConnectType.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.lbConnectType.ForeColor = System.Drawing.Color.White;
+            this.lbConnectType.Location = new System.Drawing.Point(8, 66);
+            this.lbConnectType.Name = "lbConnectType";
+            this.lbConnectType.Size = new System.Drawing.Size(60, 23);
+            this.lbConnectType.TabIndex = 2;
+            this.lbConnectType.Text = "未連線";
+            this.lbConnectType.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // tbPort
             // 
@@ -152,18 +171,18 @@ namespace MyClient_Demo
             this.tbSendMsg.Size = new System.Drawing.Size(278, 22);
             this.tbSendMsg.TabIndex = 5;
             // 
-            // lbConnectType
+            // MenuStrip
             // 
-            this.lbConnectType.BackColor = System.Drawing.Color.Silver;
-            this.lbConnectType.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lbConnectType.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
-            this.lbConnectType.ForeColor = System.Drawing.Color.White;
-            this.lbConnectType.Location = new System.Drawing.Point(8, 66);
-            this.lbConnectType.Name = "lbConnectType";
-            this.lbConnectType.Size = new System.Drawing.Size(60, 23);
-            this.lbConnectType.TabIndex = 2;
-            this.lbConnectType.Text = "未連線";
-            this.lbConnectType.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem2});
+            this.MenuStrip.Name = "MenuStrip";
+            this.MenuStrip.Size = new System.Drawing.Size(181, 48);
+            // 
+            // toolStripMenuItem2
+            // 
+            this.toolStripMenuItem2.Name = "toolStripMenuItem2";
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem2.Text = "123";
             // 
             // Form1
             // 
@@ -183,6 +202,7 @@ namespace MyClient_Demo
             this.gbClientList.ResumeLayout(false);
             this.gbSocketInfo.ResumeLayout(false);
             this.gbSocketInfo.PerformLayout();
+            this.MenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -201,6 +221,8 @@ namespace MyClient_Demo
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox tbSendMsg;
         private System.Windows.Forms.Label lbConnectType;
+        private System.Windows.Forms.ContextMenuStrip MenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem2;
     }
 }
 

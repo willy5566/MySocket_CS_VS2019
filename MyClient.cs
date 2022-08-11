@@ -12,8 +12,26 @@ namespace MySocket
         public Action<string> ReceivCallback;
         public Action<string> MsgCallback;
         public Action<bool> ConnectionStatusChange;
-
+        private string ip;
+        private int port;
         private bool connecting;
+
+        public string IP
+        {
+            get
+            {
+                return ip;
+            }
+        }
+
+        public int Port
+        {
+            get
+            {
+                return port;
+            }
+        }
+        
         public bool Connecting 
         { 
             get 
@@ -75,6 +93,13 @@ namespace MySocket
                 Console.WriteLine(s);
         }
 
+        private void SetConnecting(bool bConnecting)
+        {
+            connecting = bConnecting;
+            if (ConnectionStatusChange != null)
+                ConnectionStatusChange(connecting);
+        }
+
         #endregion
 
         #region public method
@@ -112,11 +137,10 @@ namespace MySocket
             return rtn;
         }
 
-        private void SetConnecting(bool bConnecting)
+        public void SetIPandPort(string ip, int port)
         {
-            connecting = bConnecting;
-            if (ConnectionStatusChange != null)
-                ConnectionStatusChange(connecting);
+            this.ip = ip;
+            this.port = port;
         }
 
         public void SendMsgToServer(string msg)

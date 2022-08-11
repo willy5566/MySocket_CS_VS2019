@@ -18,6 +18,7 @@ namespace MySocket
         public Action<Socket, string> ReceivCallback;
         public Action<string> MsgCallback;
         public Action<string> ClientListChange;
+        public Action<Socket> ClientSuccessCallback;
 
         public MyServer(int myPort = 10001, string myIP = "")
         {
@@ -41,6 +42,22 @@ namespace MySocket
             Close();
         }
 
+        public string IP
+        {
+            get
+            {
+                return point.Address.ToString();
+            }
+        }
+
+        public int Port
+        {
+            get
+            {
+                return point.Port;
+            }
+        }
+
         #region private method
 
         private void ServerCommunity(object obListener)
@@ -54,8 +71,16 @@ namespace MySocket
                     Socket socketSender = temp.Accept();
                     clientList.Add(socketSender);
                     ShowMsg(("Client IP = " + socketSender.RemoteEndPoint.ToString()) + " Connect Succese!");
+                    if (ClientSuccessCallback != null)
+                    {
+                        ClientSuccessCallback(socketSender);
+                        Thread.Sleep(10);
+                    }
                     if (ClientListChange != null)
+                    {
                         ClientListChange(ClientListToString());
+                        Thread.Sleep(10);
+                    }
                     Thread ReceiveMsg = new Thread(ReceiveClient);
                     ReceiveMsg.IsBackground = true;
                     ReceiveMsg.Start(socketSender);
@@ -149,11 +174,11 @@ namespace MySocket
             ShowMsg("Listening...");
         }
 
-        public void SendMsgToClient(Socket socketSender, string msg)
+        public void SendMsgToClient(Socket client, string msg)
         {
             byte[] buffer = Encoding.UTF8.GetBytes(msg);
-            socketSender.Send(buffer);
-            ShowMsg("Send to " + socketSender.RemoteEndPoint.ToString() + ": " + msg);
+            client.Send(buffer);
+            ShowMsg("Send to " + client.RemoteEndPoint.ToString() + ": " + msg);
         }
 
         public void SendMsgToAllClient(string msg)
@@ -164,7 +189,7 @@ namespace MySocket
                 client.Send(buffer);
             }
             ShowMsg("Send to all: " + msg);
-        }
+        }      
 
         public void Close()
         {

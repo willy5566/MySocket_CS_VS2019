@@ -19,6 +19,8 @@ namespace MyClient_Demo
         delegate void ShowMsg(string msg);
         delegate void ShowConnecting(ConnectType connectType);
 
+        int nSelectClientIdx = -1;
+
         public Form1()
         {
             InitializeComponent();
@@ -75,13 +77,17 @@ namespace MyClient_Demo
         {
             if (msg[1] == '#')
             {
+                var sMsg = msg.Substring(2);
                 switch (msg[0])
                 {
                     case SendType.MESSAGE:
-                        SendMsgInvoke(msg.Substring(2));
+                        SendMsgInvoke(sMsg);
                         break;
                     case SendType.CLIENT_LIST:
-                        UpdateClientListInvoke(msg.Substring(2));
+                        UpdateClientListInvoke(sMsg);
+                        break;
+                    case SendType.SEND_CLINET_IP_PORT:
+                        UpdateIPandPort(sMsg);
                         break;
                 }
             }
@@ -155,11 +161,14 @@ namespace MyClient_Demo
         {
             var sClientArray = sClientList.Split(',');
             lsbClientList.Items.Clear();
-            //foreach(var sClient in sClientArray)
-            //{
-            //    lsbClientList.Items.Add(sClient);
-            //}
-            lsbClientList.Items.AddRange(sClientArray);
+            foreach (var sClient in sClientArray)
+            {
+                //if (sClient.Contains(client.IP + ":" + client.Port.ToString()))
+                //    lsbClientList.Items.Add(sClient + "(我)");
+                //else
+                    lsbClientList.Items.Add(sClient);
+            }
+            //lsbClientList.Items.AddRange(sClientArray);
         }
 
         private void UpdateConnectStateInvoke(ConnectType connectType)
@@ -192,6 +201,69 @@ namespace MyClient_Demo
                     lbConnectType.BackColor = Color.IndianRed;
                     break;
             }
+        }
+
+        // 20220811
+        private void UpdateIPandPort(string sIPandPort)
+        {
+            var split = sIPandPort.Split(':');
+            client.SetIPandPort(split[0], Convert.ToInt32(split[1]));
+        }
+
+        // 更改名稱 20220811
+        private void ModifyName(string sName)
+        {
+            SendMsg(SendType.MODIFY_NAME, sName);
+        }
+
+        private void lsbClientList_MouseUp(object sender, MouseEventArgs e)
+        {
+            // 取消選取
+            if (nSelectClientIdx != -1)
+            {
+                int nHeight = lsbClientList.Items.Count * lsbClientList.ItemHeight;
+
+                if (e.Y > nHeight)
+                {
+                    lsbClientList.ClearSelected();
+                    nSelectClientIdx = -1;
+                    return;
+                }
+            }
+            else
+                return;
+
+            if (e.Button == MouseButtons.Left)
+            {
+                MenuStrip.Items.Clear();
+
+                if (lsbClientList.Items[nSelectClientIdx].ToString().Contains(client.Port.ToString()))
+                {
+                    MenuStrip.Items.Add("改變名稱");
+                    this.MenuStrip.Items[this.MenuStrip.Items.Count - 1].Click += new EventHandler(ModifyName_Click);
+                }
+                else
+                {
+                    MenuStrip.Items.Add("傳送訊息");
+                }
+
+                Point p = new Point(
+                    16 + this.Location.X + gbClientList.Location.X + lsbClientList.Location.X + e.X,
+                    39 + this.Location.Y + gbClientList.Location.Y + lsbClientList.Location.Y + e.Y);
+                MenuStrip.Show(p);
+            }
+        }
+
+        private void lsbClientList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            nSelectClientIdx = lsbClientList.SelectedIndex;
+        }
+
+        private void ModifyName_Click(object sender, EventArgs e)
+        {
+            string name = Microsoft.VisualBasic.Interaction.InputBox("請輸入名稱");
+            if (name != "")
+                ModifyName(name);
         }
     }
 }
