@@ -108,6 +108,10 @@ namespace MySocket
         private string ClientListToString()
         {
             string cmd = "";
+
+            if (clientList.Count < 1)
+                return cmd;
+
             cmd += clientList[0].RemoteEndPoint.ToString();
             for (int i = 1; i < clientList.Count; i++)
             {

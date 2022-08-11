@@ -133,7 +133,7 @@ namespace MyServer_Demo
 
         private void SendMsgFromClient(Socket client, string msg)
         {
-            string sMsg = client.RemoteEndPoint.ToString() + " : " + msg;
+            string sMsg = client.RemoteEndPoint.ToString() + " :" + msg;
             SendMsgInvoke(sMsg);
             SendMsg(SendType.MESSAGE, sMsg);
             //server.SendMsgToAllClient(sMsg);
