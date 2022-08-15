@@ -11,12 +11,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using MySocket;
+using MyMsg;
 
 namespace MyServer_Demo
 {
     public partial class Form1 : Form
     {
-        MyServer server;
+        MsgServer server;
         public Dictionary<Socket, string> clientNameDict; // client名稱
         delegate void ShowMsg(string msg);
 
@@ -57,7 +58,7 @@ namespace MyServer_Demo
             {
                 if (e.KeyCode == Keys.Enter)
                 {
-                    SendMsgFromServer(tbSendMsg.Text);
+                    server.SendMsgFromServer(tbSendMsg.Text);
                     tbSendMsg.Text = "";
 
                     e.Handled = true;
@@ -72,54 +73,22 @@ namespace MyServer_Demo
         {
             if (ckbAutoSocketInfo.Checked)
             {
-                server = new MyServer();
+                server = new MsgServer();
             }
             else
             {
                 string ip = tbIP.Text;
                 int port = Convert.ToInt32(tbPort.Text);
-                server = new MyServer(port, ip);
+                server = new MsgServer(port, ip);
             }
             clientNameDict = new Dictionary<Socket, string>();
 
-            server.ReceivCallback += ReceiveCallback;
-            server.MsgCallback += MsgCallback;
-            server.ClientListChange += SendClientList;
-            server.ClientSuccessCallback += SendClientIPandPort;
-            server.ClientSuccessCallback += SetClientName;            
-        }       
+            server.MsgCallback += AddServerMsgInvoke;
+            server.AddReceivMsgInvoke += AddReceivMsgInvoke;
+            server.AddMsgInvoke += AddMsgInvoke;
+        }                  
 
-        private void ReceiveCallback(Socket client, string msg)
-        {
-            string sMsg = client.RemoteEndPoint.ToString() + " : " + msg;
-            if (this.InvokeRequired)
-            {
-                ShowMsg sInvokeMsg = new ShowMsg(AddReceivMsg);
-                this.Invoke(sInvokeMsg, sMsg);
-            }
-            else
-            {
-                lsbReceivMsg.Items.Add(sMsg);
-            }
-
-            if(msg[1]=='#')
-            {
-                string sMsg2 = msg.Substring(2);
-                switch (msg[0])
-                {                    
-                    case SendType.MESSAGE:
-                        SendMsgFromClient(client, sMsg2);
-                        break;
-                    case SendType.MODIFY_NAME:
-                        SetClientName(client, sMsg2);
-                        SendClientList("");
-                        break;
-                }
-            }
-            //SendMsgFromClient(client, msg);
-        }
-
-        private void MsgCallback(string msg)
+        private void AddServerMsgInvoke(string msg)
         {
             if (this.InvokeRequired)
             {
@@ -132,73 +101,20 @@ namespace MyServer_Demo
             }
         }
 
-        private void SendMsgAll(char cType, string msg)
+        private void AddReceivMsgInvoke(string msg)
         {
-            string sMsg = cType + "#" + msg;
-            server.SendMsgToAllClient(sMsg);
-        }
-
-        // 送給單獨Client 20220811
-        private void SendMsgClient(Socket client, char cType, string msg)
-        {
-            string sMsg = cType + "#" + msg;
-            server.SendMsgToClient(client, sMsg);
-        }
-
-        private void SendClientList(string sClientList)
-        {
-            if (server.clientList.Count < 1)
-                return;
-
-            string rtn = clientNameDict[server.clientList[0]];
-            for (int i = 1; i < server.clientList.Count; i++)
+            if (this.InvokeRequired)
             {
-                rtn += "," + clientNameDict[server.clientList[i]];
+                ShowMsg sInvokeMsg = new ShowMsg(AddReceivMsg);
+                this.Invoke(sInvokeMsg, msg);
             }
-            //server.clientList
-            SendMsgAll(SendType.CLIENT_LIST, rtn);
+            else
+            {
+                lsbReceivMsg.Items.Add(msg);
+            }
         }
 
-        private void SendMsgFromClient(Socket client, string msg)
-        {
-            //string sMsg = client.RemoteEndPoint.ToString() + " :" + msg;
-            string sMsg = clientNameDict[client] + " :" + msg;
-            SendMsgInvoke(sMsg);
-            SendMsgAll(SendType.MESSAGE, sMsg);
-            //server.SendMsgToAllClient(sMsg);
-        }
-
-        private void SendMsgFromServer(string msg)
-        {
-            string sMsg = "Server :" + msg;
-            SendMsgInvoke(sMsg);
-            SendMsgAll(SendType.MESSAGE, sMsg);
-            //server.SendMsgToAllClient(sMsg);           
-        }
-
-        // 告訴Client他的IP跟Port 20220811
-        private void SendClientIPandPort(Socket client)
-        {
-            string msg = client.RemoteEndPoint.ToString();
-
-            SendMsgClient(client, SendType.SEND_CLINET_IP_PORT, msg);
-
-            Thread.Sleep(100);
-        }
-
-        private void SetClientName(Socket client)
-        {
-            string name = "匿名" + client.RemoteEndPoint.ToString().Split(':')[1];
-            clientNameDict.Add(client, name);
-        }
-
-        private void SetClientName(Socket client, string sName)
-        {
-            string name = sName + client.RemoteEndPoint.ToString().Split(':')[1];
-            clientNameDict[client] = name;
-        }
-
-        private void SendMsgInvoke(string msg)
+        private void AddMsgInvoke(string msg)
         {
             if (this.InvokeRequired)
             {

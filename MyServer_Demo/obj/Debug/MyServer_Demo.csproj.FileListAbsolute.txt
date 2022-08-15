@@ -24,3 +24,5 @@ E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS201
 E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\MyServer_Demo\obj\Debug\MyServer_Demo.csproj.CopyComplete
 E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\MyServer_Demo\obj\Debug\MyServer_Demo.exe
 E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\MyServer_Demo\obj\Debug\MyServer_Demo.pdb
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\MyServer_Demo\bin\Debug\MyMsg.dll
+E:\user\Documents\Visual Studio 2019\Projects\Socket_CS_VS2019\MySocket_CS_VS2019\MyServer_Demo\bin\Debug\MyMsg.pdb
