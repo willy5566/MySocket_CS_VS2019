@@ -85,7 +85,7 @@ namespace MySocket
             }
         }                
 
-        private void ShowMsg(string s)
+        protected void ShowMsg(string s)
         {
             if (MsgCallback != null)
                 MsgCallback(s);
@@ -93,7 +93,7 @@ namespace MySocket
                 Console.WriteLine(s);
         }
 
-        private void SetConnecting(bool bConnecting)
+        protected void SetConnecting(bool bConnecting)
         {
             connecting = bConnecting;
             if (ConnectionStatusChange != null)

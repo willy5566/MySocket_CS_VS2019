@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
-using MySocket;
+using MyMsg;
 
 namespace MyClient_Demo
 {
     public partial class Form1 : Form
     {
-        MyClient client;
+        MsgClient client;
         delegate void ShowMsg(string msg);
         delegate void ShowConnecting(ConnectType connectType);
 
@@ -40,7 +40,7 @@ namespace MyClient_Demo
             {
                 if (e.KeyCode == Keys.Enter)
                 {
-                    SendMsg(tbSendMsg.Text);
+                    client.SendMsg(tbSendMsg.Text);
                     tbSendMsg.Text = "";
 
                     e.Handled = true;
@@ -57,6 +57,7 @@ namespace MyClient_Demo
         }
 
         #endregion
+
         public void InitialClient()
         {
             if (client != null)
@@ -64,40 +65,15 @@ namespace MyClient_Demo
                 client.Close();
                 client = null;
             }
-            client = new MyClient();
+            client = new MsgClient();
             string ip = tbIP.Text;
             int port = Convert.ToInt32(tbPort.Text);
-            client.ReceivCallback += ReceiveCallback;
+            //client.ReceivCallback += ReceiveCallback;
             //client.MsgCallback += MsgCallback;
+            client.AddMsgInvoke += AddMsgInvoke;
+            client.UpdateClientListInvoke += UpdateClientListInvoke;
             client.ConnectionStatusChange += ConnectingChange;
             client.Connect(ip, port);
-        }
-
-        private void ReceiveCallback(string msg)
-        {
-            if (msg[1] == '#')
-            {
-                var sMsg = msg.Substring(2);
-                switch (msg[0])
-                {
-                    case SendType.MESSAGE:
-                        SendMsgInvoke(sMsg);
-                        break;
-                    case SendType.CLIENT_LIST:
-                        UpdateClientListInvoke(sMsg);
-                        break;
-                    case SendType.SEND_CLINET_IP_PORT:
-                        UpdateIPandPort(sMsg);
-                        break;
-                }
-            }
-            //SendMsgInvoke(msg);
-        }
-
-        private void MsgCallback(string msg)
-        {
-            string sMsg = "System :" + msg;
-            SendMsgInvoke(sMsg);
         }
 
         private void ConnectingChange(bool bConnecting)
@@ -108,7 +84,7 @@ namespace MyClient_Demo
                 UpdateConnectStateInvoke(ConnectType.Failure);
         }
 
-        private void SendMsgInvoke(string msg)
+        private void AddMsgInvoke(string msg)
         {
             if (this.InvokeRequired)
             {
@@ -124,24 +100,6 @@ namespace MyClient_Demo
         private void AddMsg(string msg)
         {
             lsbMsg.Items.Add(msg);
-        }
-
-        private void SendMsg(string msg)
-        {
-            SendMsg(SendType.MESSAGE, msg);
-        }
-
-        private void SendMsg(char cType, string msg)
-        {
-            if (client.Connecting)
-            {
-                string sMsg = cType + "#" + msg;
-                client.SendMsgToServer(sMsg);
-            }
-            else
-            {
-                AddMsg("目前尚未連線...");
-            }
         }
 
         private void UpdateClientListInvoke(string sClientList)
@@ -163,9 +121,9 @@ namespace MyClient_Demo
             lsbClientList.Items.Clear();
             foreach (var sClient in sClientArray)
             {
-                //if (sClient.Contains(client.IP + ":" + client.Port.ToString()))
-                //    lsbClientList.Items.Add(sClient + "(我)");
-                //else
+                if (sClient.Contains(client.Port.ToString()))
+                    lsbClientList.Items.Add(sClient + "(我)");
+                else
                     lsbClientList.Items.Add(sClient);
             }
             //lsbClientList.Items.AddRange(sClientArray);
@@ -201,19 +159,6 @@ namespace MyClient_Demo
                     lbConnectType.BackColor = Color.IndianRed;
                     break;
             }
-        }
-
-        // 20220811
-        private void UpdateIPandPort(string sIPandPort)
-        {
-            var split = sIPandPort.Split(':');
-            client.SetIPandPort(split[0], Convert.ToInt32(split[1]));
-        }
-
-        // 更改名稱 20220811
-        private void ModifyName(string sName)
-        {
-            SendMsg(SendType.MODIFY_NAME, sName);
         }
 
         private void lsbClientList_MouseUp(object sender, MouseEventArgs e)
@@ -263,7 +208,7 @@ namespace MyClient_Demo
         {
             string name = Microsoft.VisualBasic.Interaction.InputBox("請輸入名稱");
             if (name != "")
-                ModifyName(name);
+                client.ModifyName(name);
         }
     }
 }

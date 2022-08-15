@@ -82,7 +82,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MySocket_CS_VS2019.csproj">
+    <ProjectReference Include="..\MyMsg\MyMsg.csproj">
+      <Project>{b04d253d-ecd2-4ba2-8e09-bbc4aa552bcb}</Project>
+      <Name>MyMsg</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MySocket\MySocket_CS_VS2019.csproj">
       <Project>{e0412ceb-401d-4670-a5da-1956abfb0139}</Project>
       <Name>MySocket_CS_VS2019</Name>
     </ProjectReference>
