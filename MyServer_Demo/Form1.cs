@@ -42,7 +42,10 @@ namespace MyServer_Demo
             lsbClientList.Items.Clear();
             for (int i = 0; i < server.clientList.Count; i++)
             {
-                lsbClientList.Items.Add(server.clientList[i].RemoteEndPoint.ToString());
+                var client = server.clientList[i];
+                //string name;
+                //clientNameDict.TryGetValue(client, out name);
+                lsbClientList.Items.Add(client.RemoteEndPoint.ToString());
             }
         }
 

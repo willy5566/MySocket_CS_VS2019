@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
 using MyMsg;
+using System.Threading;
 
 namespace MyClient_Demo
 {
@@ -56,12 +57,66 @@ namespace MyClient_Demo
             this.KeyPreview = true;
         }
 
+        private void lsbClientList_MouseUp(object sender, MouseEventArgs e)
+        {
+            // 取消選取
+            if (nSelectClientIdx != -1)
+            {
+                int nHeight = lsbClientList.Items.Count * lsbClientList.ItemHeight;
+
+                if (e.Y > nHeight)
+                {
+                    lsbClientList.ClearSelected();
+                    nSelectClientIdx = -1;
+                    return;
+                }
+            }
+            else
+                return;
+
+            if (e.Button == MouseButtons.Left)
+            {
+                MenuStrip.Items.Clear();
+
+                if (lsbClientList.Items[nSelectClientIdx].ToString().Contains(client.Port.ToString()))
+                {
+                    MenuStrip.Items.Add("改變名稱");
+                    this.MenuStrip.Items[this.MenuStrip.Items.Count - 1].Click += new EventHandler(ModifyName_Click);
+                }
+                else
+                {
+                    MenuStrip.Items.Add("傳送訊息");
+                }
+
+                Point p = new Point(
+                    16 + this.Location.X + gbClientList.Location.X + lsbClientList.Location.X + e.X,
+                    39 + this.Location.Y + gbClientList.Location.Y + lsbClientList.Location.Y + e.Y);
+                MenuStrip.Show(p);
+            }
+        }
+
+        private void lsbClientList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            nSelectClientIdx = lsbClientList.SelectedIndex;
+        }
+
+        private void ModifyName_Click(object sender, EventArgs e)
+        {
+            string name = Microsoft.VisualBasic.Interaction.InputBox("請輸入名稱");
+            if (name != "")
+                client.ModifyName(name);
+        }
+
         #endregion
 
         public void InitialClient()
         {
             if (client != null)
             {
+                // 若不取消註冊舊物件與新物件同時存在時會搶UI導致顯示不正確 Willy 20220816
+                client.AddMsgInvoke -= AddMsgInvoke;
+                client.UpdateClientListInvoke -= UpdateClientListInvoke;
+                client.ConnectionStatusChange -= ConnectingChange;
                 client.Close();
                 client = null;
             }
@@ -159,56 +214,6 @@ namespace MyClient_Demo
                     lbConnectType.BackColor = Color.IndianRed;
                     break;
             }
-        }
-
-        private void lsbClientList_MouseUp(object sender, MouseEventArgs e)
-        {
-            // 取消選取
-            if (nSelectClientIdx != -1)
-            {
-                int nHeight = lsbClientList.Items.Count * lsbClientList.ItemHeight;
-
-                if (e.Y > nHeight)
-                {
-                    lsbClientList.ClearSelected();
-                    nSelectClientIdx = -1;
-                    return;
-                }
-            }
-            else
-                return;
-
-            if (e.Button == MouseButtons.Left)
-            {
-                MenuStrip.Items.Clear();
-
-                if (lsbClientList.Items[nSelectClientIdx].ToString().Contains(client.Port.ToString()))
-                {
-                    MenuStrip.Items.Add("改變名稱");
-                    this.MenuStrip.Items[this.MenuStrip.Items.Count - 1].Click += new EventHandler(ModifyName_Click);
-                }
-                else
-                {
-                    MenuStrip.Items.Add("傳送訊息");
-                }
-
-                Point p = new Point(
-                    16 + this.Location.X + gbClientList.Location.X + lsbClientList.Location.X + e.X,
-                    39 + this.Location.Y + gbClientList.Location.Y + lsbClientList.Location.Y + e.Y);
-                MenuStrip.Show(p);
-            }
-        }
-
-        private void lsbClientList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            nSelectClientIdx = lsbClientList.SelectedIndex;
-        }
-
-        private void ModifyName_Click(object sender, EventArgs e)
-        {
-            string name = Microsoft.VisualBasic.Interaction.InputBox("請輸入名稱");
-            if (name != "")
-                client.ModifyName(name);
         }
     }
 }

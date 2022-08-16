@@ -24,24 +24,31 @@ namespace MyMsg
 
         private void ReceiveCallback(string msg)
         {
-            if (msg[1] == '#')
+            var msgList = MsgCommon.CheckCombine(msg);
+
+            foreach (var m in msgList)
             {
-                var sMsg = msg.Substring(2);
-                switch (msg[0])
+                if (m[1] == '#')
                 {
-                    case SendType.MESSAGE:
-                        AddMsgInvoke(sMsg);
-                        break;
-                    case SendType.CLIENT_LIST:
-                        UpdateClientListInvoke(sMsg);
-                        break;
-                    case SendType.SEND_CLINET_IP_PORT:
-                        UpdateIPandPort(sMsg);
-                        break;
+                    var sMsg = m.Substring(2);
+                    switch (m[0])
+                    {
+                        case SendType.MESSAGE:
+                            if (AddMsgInvoke != null)
+                                AddMsgInvoke(sMsg);
+                            break;
+                        case SendType.CLIENT_LIST:
+                            if (UpdateClientListInvoke != null)
+                                UpdateClientListInvoke(sMsg);
+                            break;
+                        case SendType.SEND_CLINET_IP_PORT:
+                            UpdateIPandPort(sMsg);
+                            break;
+                    }
                 }
             }
             //SendMsgInvoke(msg);
-        }
+        }        
 
         private void UpdateIPandPort(string sIPandPort)
         {
@@ -63,7 +70,8 @@ namespace MyMsg
             }
             else
             {
-                AddMsgInvoke("目前尚未連線...");
+                if (AddMsgInvoke != null)
+                    AddMsgInvoke("目前尚未連線...");
             }
         }
 
